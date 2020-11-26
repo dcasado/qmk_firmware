@@ -31,6 +31,6 @@
 // #define SPLIT_USB_DETECT
 // #define NO_USB_STARTUP_CHECK
 
-// #define MASTER_RIGHT
+#define MASTER_RIGHT
 #define RGBLIGHT_SPLIT
 #define RGBLIGHT_SLEEP
