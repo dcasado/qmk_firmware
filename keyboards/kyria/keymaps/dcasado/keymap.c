@@ -257,6 +257,12 @@ static void render_status(void) {
         default:
             oled_write_P(PSTR("Undefined\n"), false);
     }
+    oled_write_P(PSTR("Is Mac?: "), false);
+    if (IS_MAC) {
+        oled_write_P(PSTR("Yes"), false);
+    } else {
+        oled_write_P(PSTR("No"), false);
+    }
 
     // Host Keyboard LED Status
     uint8_t led_usb_state = host_keyboard_leds();
