@@ -26,7 +26,8 @@ enum layers {
     _LOWER,
     _RAISE,
     _ADJUST,
-    _MEDIA
+    _MEDIA,
+    _GAME
 };
 
 enum custom_keycodes {
@@ -50,9 +51,13 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 // when keycode QMKBEST is pressed
                 if ((keyboard_report->mods & MOD_BIT (KC_LSFT)) || (keyboard_report->mods & MOD_BIT (KC_RSFT))) {
                     clear_mods();
-                    SEND_STRING(SS_ALGR("n")"N");
+                    if (IS_MAC) {
+                        SEND_STRING(SS_ALGR("n")"N");
+                    }
                 } else {
-                    SEND_STRING(SS_ALGR("n")"n");
+                    if (IS_MAC) {
+                        SEND_STRING(SS_ALGR("n")"n");
+                    }
                 }
             } else {
                 // when keycode QMKBEST is released
@@ -64,7 +69,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 if (IS_MAC) {
                     SEND_STRING(SS_DOWN(X_LCTL)SS_DOWN(X_LOPT)SS_TAP(X_F12));
                 } else {
-                    SEND_STRING(SS_LWIN("l"));
+                    SEND_STRING(SS_DOWN(X_LGUI)SS_TAP(X_ESC));
                 }
             } else {
                 // when keycode SLEEP is released
@@ -161,7 +166,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * Media Layer: Media, RGB
  *
  * ,-------------------------------------------.                              ,-------------------------------------------.
- * |        |      |      |      |      |      |                              | SLEEP| SNST |      |      |      |        |
+ * |        |      |      |      |      |      |                              | SLEEP| SNST |      | NLCK | CLCK |  SLCK  |
  * |--------+------+------+------+------+------|                              |------+------+------+------+------+--------|
  * |        |      | Prev | Play | Next |      |                              | TOG  | SAI  | HUI  | VAI  | MOD  |        |
  * |--------+------+------+------+------+------+-------------.  ,-------------+------+------+------+------+------+--------|
@@ -172,10 +177,30 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *                        `----------------------------------'  `----------------------------------'
  */
     [_MEDIA] = LAYOUT(
-      _______, _______, _______, _______, _______, SET_OS,                                      SLEEP,   KC_SNST, _______, _______, _______,  _______,
+      TG(_GAME), _______, _______, _______, _______, SET_OS,                                      SLEEP,   KC_SNST, _______, KC_NLCK, KC_CLCK,  KC_SLCK,
       _______, _______, KC_MPRV, KC_MPLY, KC_MNXT, _______,                                     RGB_TOG, RGB_SAI, RGB_HUI, RGB_VAI, RGB_MOD,  _______,
       _______, _______, KC_VOLD, KC_MUTE, KC_VOLU, _______, _______, _______, _______, _______, _______, RGB_SAD, RGB_HUD, RGB_VAD, RGB_RMOD, _______,
                                  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______
+    ),
+/*
+ * Game Layer: 
+ *
+ * ,-------------------------------------------.                              ,-------------------------------------------.
+ * |        |      |      |      |      |      |                              |      |      |      |      |      |        |
+ * |--------+------+------+------+------+------|                              |------+------+------+------+------+--------|
+ * |        |      |      |      |      |      |                              |      |      |      |      |      |        |
+ * |--------+------+------+------+------+------+-------------.  ,-------------+------+------+------+------+------+--------|
+ * |        |      |      |      |      |      |      |      |  |      |      |      |      |      |      |      |        |
+ * `----------------------+------+------+------+------+------|  |------+------+------+------+------+----------------------'
+ *                        |      |      |      | Space|      |  |      |      |      |      |      |
+ *                        |      |      |      |      |      |  |      |      |      |      |      |
+ *                        `----------------------------------'  `----------------------------------'
+ */
+    [_GAME] = LAYOUT(
+      _______, _______, _______, _______, _______, _______,                                     _______, _______, _______, _______, _______, _______,
+      _______, _______, _______, _______, _______, _______,                                     _______, _______, _______, _______, _______, _______,
+      _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
+                                 _______, _______, _______, KC_SPC,  _______, _______, _______, _______, _______, _______
     ),
 // /*
 //  * Layer template
@@ -254,14 +279,17 @@ static void render_status(void) {
         case _MEDIA:
             oled_write_P(PSTR("Media\n"), false);
             break;
+        case _GAME:
+            oled_write_P(PSTR("Game\n"), false);
+            break;
         default:
             oled_write_P(PSTR("Undefined\n"), false);
     }
     oled_write_P(PSTR("Is Mac?: "), false);
     if (IS_MAC) {
-        oled_write_P(PSTR("Yes"), false);
+        oled_write_P(PSTR("Yes\n"), false);
     } else {
-        oled_write_P(PSTR("No"), false);
+        oled_write_P(PSTR("No\n"), false);
     }
 
     // Host Keyboard LED Status
